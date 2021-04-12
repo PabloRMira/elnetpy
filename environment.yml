@@ -4,3 +4,5 @@ dependencies:
   - pybind11
   - pandas
   - numpy
+  - black
+  - isort

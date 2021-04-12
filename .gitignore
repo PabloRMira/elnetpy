@@ -1,1 +1,4 @@
 conda-recipe/
+build/
+*.egg-info
+*.so
