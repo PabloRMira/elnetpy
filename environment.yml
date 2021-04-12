@@ -6,3 +6,4 @@ dependencies:
   - numpy
   - black
   - isort
+  - flake8
