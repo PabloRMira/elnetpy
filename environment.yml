@@ -1,0 +1,6 @@
+name: elnetpy-dev
+dependencies:
+  - python=3.7
+  - pybind11
+  - pandas
+  - numpy
