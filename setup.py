@@ -2,7 +2,6 @@ from pkg_resources import parse_version
 from configparser import ConfigParser
 import setuptools
 from pybind11.setup_helpers import Pybind11Extension, build_ext
-from pybind11 import get_cmake_dir
 
 
 assert parse_version(setuptools.__version__) >= parse_version("36.2")
@@ -46,7 +45,7 @@ min_python = cfg["min_python"]
 ext_modules = [
     Pybind11Extension(
         "elnetpy",
-        ["src/elnetpy.cpp"],
+        ["src/elnetpy.cpp", "src/funcs.cpp"],
         define_macros=[("VERSION_INFO", cfg["version"])],
     ),
 ]
