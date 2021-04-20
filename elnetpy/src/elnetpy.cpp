@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include "funcs.h"
+#include "elnet_linear.hpp"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -9,7 +9,7 @@ namespace py = pybind11;
 PYBIND11_MODULE(elnetpy, m)
 {
     m.doc() = R"pbdoc(
-        Pybind11 example plugin
+        Elastic Net C++ internal functions
         -----------------------
         .. currentmodule:: elnetpy
         .. autosummary::
@@ -17,14 +17,7 @@ PYBIND11_MODULE(elnetpy, m)
            add
     )pbdoc";
 
-    m.def("add", &add, R"pbdoc(
-        Add two numbers
-        Some other explanation about the add function.
-    )pbdoc");
-
-    m.def("matrix_mult", &matrix_mult, py::return_value_policy::reference_internal);
-    /*    m.def("inv", &inv);*/
-    m.def("get_matrix", &get_matrix, py::return_value_policy::reference_internal);
+    m.def("elnet_linear", &elnet_linear, py::return_value_policy::reference_internal);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
