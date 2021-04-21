@@ -3,3 +3,5 @@ build/
 *.egg-info
 *.so
 .vscode
+test
+test.cpp
