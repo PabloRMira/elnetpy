@@ -45,7 +45,7 @@ min_python = cfg["min_python"]
 ext_modules = [
     Pybind11Extension(
         "elnetpy",
-        ["src/elnetpy.cpp", "src/funcs.cpp"],
+        ["elnetpy/src/elnet_linear.cpp"],
         define_macros=[("VERSION_INFO", cfg["version"])],
     ),
 ]
