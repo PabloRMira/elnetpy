@@ -1,5 +1,6 @@
 #include <cmath>
 #include "Eigen/Dense"
+#include "utils.hpp"
 
 double get_sd(const Eigen::VectorXd &v)
 {

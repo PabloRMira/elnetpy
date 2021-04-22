@@ -4,7 +4,7 @@
 
 TEST(UtilsTests, TestGetSd)
 {
-    Eigen::VectorXd v(5);
+    Eigen::VectorXd v(4);
     v << -1, 1, 1, -1;
     EXPECT_EQ(get_sd(v), 1);
 }
