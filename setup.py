@@ -1,8 +1,12 @@
 from pkg_resources import parse_version
 from configparser import ConfigParser
 import setuptools
-from pybind11.setup_helpers import Pybind11Extension, build_ext
+from pybind11.setup_helpers import build_ext
 
+try:
+    from pybind11.setup_helpers import Pybind11Extension
+except ImportError:
+    from setuptools import Extension as Pybind11Extension
 
 assert parse_version(setuptools.__version__) >= parse_version("36.2")
 # note: all settings are in settings.ini; edit there, not here
@@ -45,7 +49,9 @@ min_python = cfg["min_python"]
 ext_modules = [
     Pybind11Extension(
         "elnetpy",
-        ["elnetpy/src/elnet_linear.cpp"],
+        ["elnetpy/cpp/pybind_wrapper.cpp",
+         "elnetpy/cpp/libelnet_wrapper.cpp",
+         "libelnet/src/linear_elnet.cpp"],
         define_macros=[("VERSION_INFO", cfg["version"])],
     ),
 ]
