@@ -7,3 +7,5 @@ dependencies:
   - black
   - isort
   - flake8
+  - scipy
+  - pytest
