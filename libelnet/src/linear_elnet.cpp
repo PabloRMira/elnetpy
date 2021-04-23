@@ -10,9 +10,9 @@ Eigen::VectorXd linear_elnet_optim(
     const int &n_vars,
     const int &n_obs,
     const Eigen::VectorXd &init_beta,
-    const bool init_beta_available = false,
-    const double &tol = 1e-7,
-    const int &maxit = 1e+5)
+    const bool init_beta_available,
+    const double &tol,
+    const int &maxit)
 {
     Eigen::VectorXd previous_beta;
     if (init_beta_available) /* if warm start available */
@@ -66,39 +66,32 @@ Eigen::VectorXd linear_elnet_optim(
     return beta;
 }
 
-/** Estimate elastic net for the linear model
- * 
- * @param X Predictors. Assumed to be standardized beforehand (mean 0 and variance 1)
- * @param y Response. Assumed to be standardized beforehand
- * @param lambdas Vector of regularization parameters. Assumed to be normalized 
- * via standard deviation of y beforehand
- * @param tol Tolerance level for stopping criterion
- * @param maxit Maximum number of iterations
- * @return Estimated elastic net coefficients
-*/
 Eigen::MatrixXd linear_elnet_coefs(
     const Eigen::MatrixXd &X,
     const Eigen::VectorXd &y,
     const Eigen::VectorXd &lambdas,
-    const double &tol = 1e-7,
-    const int &maxit = 1e+5)
+    const double &tol,
+    const int &maxit)
 {
     const int n_obs = X.rows();
     const int n_vars = X.cols();
     const int n_lambdas = lambdas.size();
+    double lambda = lambdas(0);
     Eigen::MatrixXd beta_mat = Eigen::MatrixXd::Zero(n_vars, n_lambdas);
-    Eigen::VectorXd pseudo_init_beta = Eigen::VectorXd::Zero(1);
-    beta_mat.col(0) = linear_elnet_optim(X, y, lambdas(0),
+    Eigen::VectorXd init_beta = Eigen::VectorXd::Zero(1);
+    beta_mat.col(0) = linear_elnet_optim(X, y, lambda,
                                          n_vars, n_obs,
-                                         pseudo_init_beta, false,
+                                         init_beta, false,
                                          tol, maxit);
     if (n_lambdas > 1)
     {
         for (int k = 1; k < n_lambdas; k++)
         {
-            beta_mat.col(k) = linear_elnet_optim(X, y, lambdas(0),
+            lambda = lambdas(0);
+            init_beta = beta_mat.col(k - 1);
+            beta_mat.col(k) = linear_elnet_optim(X, y, lambda,
                                                  n_vars, n_obs,
-                                                 beta_mat.col(k - 1), true,
+                                                 init_beta, true,
                                                  tol, maxit);
         }
     }
