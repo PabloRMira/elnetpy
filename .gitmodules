@@ -1,6 +1,6 @@
 [submodule "lib/googletest"]
-	path = lib/googletest
+	path = libelnet/lib/googletest
 	url = https://github.com/google/googletest
 [submodule "lib/eigen"]
-	path = lib/eigen
+	path = libelnet/lib/eigen
 	url = https://gitlab.com/libeigen/eigen
