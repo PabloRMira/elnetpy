@@ -12,7 +12,7 @@ Eigen::VectorXd linear_elnet_optim(
     const Eigen::VectorXd &init_beta,
     const bool init_beta_available = false,
     const double &tol = 1e-7,
-    const double &maxit = 1e+5)
+    const int &maxit = 1e+5)
 {
     Eigen::VectorXd previous_beta;
     if (init_beta_available) /* if warm start available */
@@ -80,8 +80,8 @@ Eigen::MatrixXd linear_elnet_coefs(
     const Eigen::MatrixXd &X,
     const Eigen::VectorXd &y,
     const Eigen::VectorXd &lambdas,
-    const double tol = 1e-7,
-    const double maxit = 1e+5)
+    const double &tol = 1e-7,
+    const int &maxit = 1e+5)
 {
     const int n_obs = X.rows();
     const int n_vars = X.cols();
