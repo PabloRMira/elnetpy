@@ -26,7 +26,7 @@ add_library(${MAIN_LIBRARY} STATIC ${SOURCES})
 enable_testing()
 
 # add executable for the tests
-file(GLOB TEST_SOURCES "tests_cpp/*.cpp")
+file(GLOB TEST_SOURCES "tests/*.cpp")
 add_executable(test_libelnet ${TEST_SOURCES})
 
 # link main source code and googletest to test executable
