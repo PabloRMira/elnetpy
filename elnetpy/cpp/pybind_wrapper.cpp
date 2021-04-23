@@ -17,7 +17,7 @@ PYBIND11_MODULE(elnetpy, m)
            add
     )pbdoc";
 
-    m.def("linear_elnet_coefs", &linear_elnet_coefs, py::return_value_policy::reference_internal);
+    m.def("linear_elnet", &linear_elnet, py::return_value_policy::reference_internal);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
