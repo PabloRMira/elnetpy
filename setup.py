@@ -50,8 +50,8 @@ ext_modules = [
     Pybind11Extension(
         "_elnetpy",
         [
-            "elnetpy/pybind_wrapper.cpp",
-            "elnetpy/libelnet_wrapper.cpp",
+            "elnetpy/cpp/pybind_wrapper.cpp",
+            "elnetpy/cpp/libelnet_wrapper.cpp",
             "libelnet/src/linear_elnet.cpp",
         ],
         include_dirs=["libelnet/src", "libelnet/lib/eigen", "elnetpy"],
