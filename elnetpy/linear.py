@@ -22,7 +22,7 @@ class Elnet(BaseEstimator):
     ):
         self.alpha = alpha
         self.lambdas = lambdas
-        self.n_labmda = n_lambda
+        self.n_lambda = n_lambda
         self.min_lambda_ratio = min_lambda_ratio
         self.n_jobs = n_jobs
         self.tol = tol
