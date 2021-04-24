@@ -48,7 +48,7 @@ min_python = cfg["min_python"]
 
 ext_modules = [
     Pybind11Extension(
-        "elnetpy",
+        "_elnetpy",
         [
             "elnetpy/pybind_wrapper.cpp",
             "elnetpy/libelnet_wrapper.cpp",

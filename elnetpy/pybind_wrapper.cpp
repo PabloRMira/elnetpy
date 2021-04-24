@@ -6,7 +6,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(elnetpy, m)
+PYBIND11_MODULE(_elnetpy, m)
 {
     m.doc() = R"pbdoc(
         Elastic Net C++ internal functions
