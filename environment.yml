@@ -9,3 +9,4 @@ dependencies:
   - flake8
   - scipy
   - pytest
+  - scikit-learn
