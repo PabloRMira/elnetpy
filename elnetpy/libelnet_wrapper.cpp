@@ -1,6 +1,6 @@
-#include "../../libelnet/lib/eigen/Eigen/Dense"
+#include "Eigen/Dense"
 #include <pybind11/eigen.h>
-#include "../../libelnet/src/linear_elnet.hpp"
+#include "linear_elnet.hpp"
 #include "libelnet_wrapper.hpp"
 
 Eigen::MatrixXd linear_elnet(

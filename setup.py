@@ -49,9 +49,12 @@ min_python = cfg["min_python"]
 ext_modules = [
     Pybind11Extension(
         "elnetpy",
-        ["elnetpy/cpp/pybind_wrapper.cpp",
-         "elnetpy/cpp/libelnet_wrapper.cpp",
-         "libelnet/src/linear_elnet.cpp"],
+        [
+            "elnetpy/pybind_wrapper.cpp",
+            "elnetpy/libelnet_wrapper.cpp",
+            "libelnet/src/linear_elnet.cpp",
+        ],
+        include_dirs=["libelnet/src", "libelnet/lib/eigen", "elnetpy"],
         define_macros=[("VERSION_INFO", cfg["version"])],
     ),
 ]

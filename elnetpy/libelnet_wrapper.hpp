@@ -1,9 +1,9 @@
 #ifndef LIBELNET_WRAPPER_H
 #define LIBELNET_WRAPPER_H
 
-#include "../../libelnet/lib/eigen/Eigen/Dense"
+#include "Eigen/Dense"
 #include <pybind11/eigen.h>
-#include "../../libelnet/src/linear_elnet.hpp"
+#include "linear_elnet.hpp"
 
 Eigen::MatrixXd linear_elnet(
     Eigen::Ref<Eigen::MatrixXd> X,
