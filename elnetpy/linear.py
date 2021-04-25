@@ -53,7 +53,7 @@ class Elnet(BaseEstimator):
             self.lambda_path_ = (
                 self.lambdas
                 if isinstance(self.lambdas, np.ndarray)
-                else np.array(self.lambdas)
+                else np.array([self.lambdas])
             ).astype(dtype="float64") / y_std
 
         # get standardized coefficients
