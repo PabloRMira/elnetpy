@@ -87,7 +87,7 @@ Eigen::MatrixXd linear_elnet_coefs(
     {
         for (int k = 1; k < n_lambdas; k++)
         {
-            lambda = lambdas(0);
+            lambda = lambdas(k);
             init_beta = beta_mat.col(k - 1);
             beta_mat.col(k) = linear_elnet_optim(X, y, lambda,
                                                  n_vars, n_obs,
