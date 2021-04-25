@@ -9,4 +9,7 @@ dependencies:
   - flake8
   - scipy
   - pytest
+  - pytest-benchmark
   - scikit-learn
+  - coverage
+  - coverage-badge
