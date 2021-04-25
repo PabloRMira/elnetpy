@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.base import BaseEstimator
 
 from elnetpy import linear_elnet
-from elnetpy.utils import standardize_inputs
+from elnetpy.utils import standardize_inputs, destandardize_coefs, get_lambda_path
 
 
 class Elnet(BaseEstimator):
@@ -40,19 +40,28 @@ class Elnet(BaseEstimator):
         # we need Fortran column major storage order
         _X = X.astype(dtype="float64", order="F", copy=True)
         _y = y.astype(dtype="float64", copy=True)
+
+        _X, _y, X_means, X_stds, y_mean, y_std = standardize_inputs(
+            _X, _y, return_means_stds=True
+        )
+
         if self.lambdas is None:
-            pass
-        #            lambdas = get_lambdas()
+            self.lambda_path_ = get_lambda_path(
+                _X, _y, self.alpha, self.min_lambda_ratio, self.n_lambda
+            )
         else:
-            lambdas = (
+            self.lambda_path_ = (
                 self.lambdas
                 if isinstance(self.lambdas, np.ndarray)
                 else np.array(self.lambdas)
-            )
-            lambdas = lambdas.astype(dtype="float64")
+            ).astype(dtype="float64") / y_std
 
-        _X, _y, lambdas = standardize_inputs(_X, _y, lambdas)
+        # get standardized coefficients
+        coefs_mat = linear_elnet(_X, _y, self.lambda_path_, self.tol, self.max_iter)
 
-        _coefs = linear_elnet(_X, _y, lambdas, self.tol, self.max_iter)
+        # destandardize coefficients and get intercepts
+        self.coef_path_, self.intercept_path_ = destandardize_coefs(
+            coefs_mat, X_means, X_stds, y_mean, y_std
+        )
 
         return self
