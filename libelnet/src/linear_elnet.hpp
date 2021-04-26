@@ -3,7 +3,7 @@
 
 #include "Eigen/Dense"
 
-/** Optimization step for the linear elastic net
+/** Optimization step for the linear lasso
  * 
  * @param X Predictors
  * @param y Response
@@ -15,9 +15,9 @@
  * defaults to false
  * @param tol Tolerance level for stopping criterion
  * @param maxit Maximum number of iterations
- * @return Estimated elastic net coefficients
+ * @return Estimated lasso coefficients
 */
-Eigen::VectorXd linear_elnet_optim(
+Eigen::VectorXd linear_lasso_optim(
     const Eigen::MatrixXd &X,
     const Eigen::VectorXd &y,
     const double &lambda,
@@ -28,12 +28,106 @@ Eigen::VectorXd linear_elnet_optim(
     const double &tol = 1e-7,
     const int &maxit = 1e+5);
 
+/** Optimization step for the linear elastic net
+ * 
+ * @param X Predictors
+ * @param y Response
+ * @param lambda Regularization parameter
+ * @param alpha Regularization hyperparameter
+ * @param n_vars Number of variables / predictors
+ * @param n_obs Number of observations / rows
+ * @param init_beta Initial coefficients for warm starts
+ * @param init_beta_available Whether init_beta should be used as warm start,
+ * defaults to false
+ * @param tol Tolerance level for stopping criterion
+ * @param maxit Maximum number of iterations
+ * @return Estimated elastic net coefficients
+*/
+Eigen::VectorXd linear_elastic_net_optim(
+    const Eigen::MatrixXd &X,
+    const Eigen::VectorXd &y,
+    const double &lambda,
+    const double &alpha,
+    const int &n_vars,
+    const int &n_obs,
+    const Eigen::VectorXd &init_beta,
+    const bool init_beta_available = false,
+    const double &tol = 1e-7,
+    const int &maxit = 1e+5);
+
+/** Optimization step for the linear ridge estimator
+ * 
+ * @param X Predictors
+ * @param y Response
+ * @param lambda Regularization parameter
+ * @param n_vars Number of variables / predictors
+ * @param n_obs Number of observations / rows
+ * @return Estimated ridge coefficients
+*/
+Eigen::MatrixXd linear_ridge_optim(
+    const Eigen::MatrixXd &X,
+    const Eigen::MatrixXd &y,
+    const double &lambda,
+    const int &n_vars,
+    const int &n_obs);
+
+/** Estimate matrix of coefficients for the linear lasso
+ * 
+ * @param X Predictors. Assumed to be standardized beforehand (mean 0 and variance 1)
+ * @param y Response. Assumed to be standardized beforehand
+ * @param lambdas Vector of regularization parameters. Assumed to be normalized 
+ * via standard deviation of y beforehand
+ * @param tol Tolerance level for stopping criterion
+ * @param maxit Maximum number of iterations
+ * @return Estimated coefficients for each lambda
+*/
+Eigen::MatrixXd linear_lasso_component(
+    const Eigen::MatrixXd &X,
+    const Eigen::VectorXd &y,
+    const Eigen::VectorXd &lambdas,
+    const double &tol,
+    const int &maxit);
+
+/** Estimate matrix of coefficients for the linear elastic net
+ * 
+ * @param X Predictors. Assumed to be standardized beforehand (mean 0 and variance 1)
+ * @param y Response. Assumed to be standardized beforehand
+ * @param lambdas Vector of regularization parameters. Assumed to be normalized 
+ * via standard deviation of y beforehand
+ * @param alpha Regularization hyper parameter
+ * @param tol Tolerance level for stopping criterion
+ * @param maxit Maximum number of iterations
+ * @return Estimated coefficients for each lambda
+*/
+Eigen::MatrixXd linear_elastic_net_component(
+    const Eigen::MatrixXd &X,
+    const Eigen::VectorXd &y,
+    const Eigen::VectorXd &lambdas,
+    const double &alpha,
+    const double &tol,
+    const int &maxit);
+
+/** Estimate matrix of coefficients for the linear ridge
+ * 
+ * @param X Predictors. Assumed to be standardized beforehand (mean 0 and variance 1)
+ * @param y Response. Assumed to be standardized beforehand
+ * @param lambdas Vector of regularization parameters. Assumed to be normalized 
+ * via standard deviation of y beforehand
+ * @return Estimated coefficients for each lambda
+*/
+Eigen::MatrixXd linear_ridge_component(
+    const Eigen::MatrixXd &X,
+    const Eigen::VectorXd &y,
+    const Eigen::VectorXd &lambdas);
+
 /** Estimate elastic net for the linear model
  * 
  * @param X Predictors. Assumed to be standardized beforehand (mean 0 and variance 1)
  * @param y Response. Assumed to be standardized beforehand
  * @param lambdas Vector of regularization parameters. Assumed to be normalized 
  * via standard deviation of y beforehand
+ * @param alpha Regularization hyperparameter. 1 for lasso,
+ * 0 for ridge and (0, 1) for elastic net
  * @param tol Tolerance level for stopping criterion
  * @param maxit Maximum number of iterations
  * @return Estimated elastic net coefficients
@@ -42,6 +136,7 @@ Eigen::MatrixXd linear_elnet_coefs(
     const Eigen::MatrixXd &X,
     const Eigen::VectorXd &y,
     const Eigen::VectorXd &lambdas,
+    const double &alpha,
     const double &tol = 1e-7,
     const int &maxit = 1e+5);
 
