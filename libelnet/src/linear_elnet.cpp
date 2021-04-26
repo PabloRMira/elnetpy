@@ -226,7 +226,7 @@ Eigen::MatrixXd linear_ridge_component(
     double lambda = lambdas(0);
     Eigen::MatrixXd beta_mat = Eigen::MatrixXd::Zero(n_vars, n_lambdas);
     Eigen::VectorXd init_beta = Eigen::VectorXd::Zero(1);
-    beta_mat.col(0) = linear_ridge_optim(X, y, lambda, n_obs, n_vars);
+    beta_mat.col(0) = linear_ridge_optim(X, y, lambda, n_vars, n_obs);
     if (n_lambdas > 1)
     {
         for (int k = 1; k < n_lambdas; k++)
