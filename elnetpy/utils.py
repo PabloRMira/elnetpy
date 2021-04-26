@@ -38,13 +38,13 @@ def destandardize_coefs(coefs_mat, X_means, X_stds, y_mean, y_std):
     return coefs_mat_destd, intercepts
 
 
-def get_lambda_path(X, y, y_std, alpha, min_lambda_ratio, n_lambda):
+def get_lambda_path(X, y, y_std, min_lambda_ratio, n_lambda):
     n_obs = X.shape[0]
     lambda_max = np.max(np.abs(X.T.dot(y))) / n_obs
     lambda_min = lambda_max * min_lambda_ratio
     # descending sequence on the log scale
-    lambda_path = (
-        np.exp(np.linspace(np.log(lambda_min), np.log(lambda_max), n_lambda))[::-1]
-        / y_std
-    )
+    lambda_path = np.exp(np.linspace(np.log(lambda_min), np.log(lambda_max), n_lambda))[
+        ::-1
+    ]
+    lambda_path = np.ascontiguousarray(lambda_path)  # need contiguous array for c++ code to work
     return lambda_path
