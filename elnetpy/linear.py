@@ -46,18 +46,20 @@ class Elnet(BaseEstimator):
         )
 
         if self.lambdas is None:
-            self.lambda_path_ = get_lambda_path(
-                _X, _y, y_std, self.min_lambda_ratio, self.n_lambda
+            lambda_path_std = get_lambda_path(
+                _X, _y, self.min_lambda_ratio, self.n_lambda
             )
+            self.lambda_path_ = lambda_path_std * y_std
         else:
-            self.lambda_path_ = (
+            lambda_path_std = (
                 self.lambdas
                 if isinstance(self.lambdas, np.ndarray)
                 else np.array([self.lambdas])
             ).astype(dtype="float64") / y_std
+            self.lambda_path_ = self.lambdas
 
         # get standardized coefficients
-        coefs_mat = linear_elnet(_X, _y, self.lambda_path_, self.tol, self.max_iter)
+        coefs_mat = linear_elnet(_X, _y, lambda_path_std, self.tol, self.max_iter)
 
         # destandardize coefficients and get intercepts
         self.coef_path_, self.intercept_path_ = destandardize_coefs(
