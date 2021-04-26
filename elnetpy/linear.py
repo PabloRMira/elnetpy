@@ -59,7 +59,9 @@ class Elnet(BaseEstimator):
             self.lambda_path_ = self.lambdas
 
         # get standardized coefficients
-        coefs_mat = linear_elnet(_X, _y, lambda_path_std, self.tol, self.max_iter)
+        coefs_mat = linear_elnet(
+            _X, _y, lambda_path_std, self.alpha, self.tol, self.max_iter
+        )
 
         # destandardize coefficients and get intercepts
         self.coef_path_, self.intercept_path_ = destandardize_coefs(
