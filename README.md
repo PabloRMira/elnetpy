@@ -1,5 +1,5 @@
 # Welcome to elnetpy!
 
-A C++ implementation of the elastic net algorithm
+A Python package to compute the elastic net algorithm, boosted by an own C++ implementation.
 
 > Work in progress!
