@@ -47,7 +47,7 @@ class Elnet(BaseEstimator):
 
         if self.lambdas is None:
             lambda_path_std = get_lambda_path(
-                _X, _y, self.min_lambda_ratio, self.n_lambda
+                _X, _y, self.alpha, self.min_lambda_ratio, self.n_lambda
             )
             self.lambda_path_ = lambda_path_std * y_std
         else:
