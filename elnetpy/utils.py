@@ -38,9 +38,10 @@ def destandardize_coefs(coefs_mat, X_means, X_stds, y_mean, y_std):
     return coefs_mat_destd, intercepts
 
 
-def get_lambda_path(X, y, min_lambda_ratio, n_lambda):
+def get_lambda_path(X, y, alpha, min_lambda_ratio, n_lambda):
     n_obs = X.shape[0]
-    lambda_max = np.max(np.abs(X.T.dot(y))) / n_obs
+    alpha_adj = alpha if alpha > 0 else 0.001
+    lambda_max = np.max(np.abs(X.T.dot(y))) / (n_obs * alpha_adj)
     lambda_min = lambda_max * min_lambda_ratio
     # descending sequence on the log scale
     lambda_path = np.exp(np.linspace(np.log(lambda_min), np.log(lambda_max), n_lambda))[
