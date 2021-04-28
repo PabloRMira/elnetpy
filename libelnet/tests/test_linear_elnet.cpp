@@ -3,7 +3,7 @@
 
 #include "linear_elnet.hpp"
 
-TEST(LinearElnet, LinearElnetOptim)
+TEST(LinearElnet, LinearLassoOptim)
 {
     Eigen::Matrix3d X;
     X << -0.48, -1.33, 1.22,
@@ -41,7 +41,6 @@ TEST(LinearElnet, LassoCoefsNumber)
     EXPECT_EQ(out_ncol, expected_ncol);
 }
 
-
 TEST(LinearElnet, RidgeCoefsNumber)
 {
     Eigen::Matrix3d X;
@@ -50,17 +49,16 @@ TEST(LinearElnet, RidgeCoefsNumber)
         1.39, 1.07, -1.22;
     Eigen::Vector3d y;
     y << -1.12, 1.30, -0.18;
-    Eigen::VectorXd lambdas(5);
-    lambdas << 0, 0.5, 0.8, 0.9, 1;
+    Eigen::VectorXd lambdas(6);
+    lambdas << 0, 0.5, 0.8, 0.9, 1, 100;
     Eigen::MatrixXd out_beta_mat = linear_elnet_coefs(X, y, lambdas, 0);
     int expected_nrow = 3;
-    int expected_ncol = 5;
+    int expected_ncol = 6;
     int out_nrow = out_beta_mat.rows();
     int out_ncol = out_beta_mat.cols();
     EXPECT_EQ(out_nrow, expected_nrow);
     EXPECT_EQ(out_ncol, expected_ncol);
 }
-
 
 TEST(LinearElnet, ElasticNetCoefsNumber)
 {
