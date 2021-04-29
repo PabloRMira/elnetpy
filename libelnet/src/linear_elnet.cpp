@@ -77,16 +77,8 @@ Eigen::VectorXd linear_elastic_net_optim(
     double diff_norm = 1;
     double lambda_alpha;
     double denomi; /* denominator for update */
-    if (alpha == 0)
-    {
-        lambda_alpha = 0.0;
-        denomi = 1 + lambda;
-    }
-    else
-    {
-        lambda_alpha = lambda * alpha;
-        denomi = 1 + (lambda * (1 - alpha));
-    }
+    lambda_alpha = lambda * alpha;
+    denomi = 1 + (lambda * (1 - alpha));
     while ((diff_norm > tol) && (iter < maxit))
     {
         for (int j = 0; j < n_vars; j++)
@@ -169,11 +161,20 @@ Eigen::MatrixXd linear_elastic_net_component(
     const int n_lambdas = lambdas.size();
     double lambda = lambdas(0);
     Eigen::MatrixXd beta_mat = Eigen::MatrixXd::Zero(n_vars, n_lambdas);
-    Eigen::VectorXd init_beta = Eigen::VectorXd::Zero(n_vars);
-    beta_mat.col(0) = linear_elastic_net_optim(X, y, lambda, alpha,
-                                               n_vars, n_obs,
-                                               init_beta,
-                                               tol, maxit);
+    Eigen::VectorXd init_beta;
+    if (alpha == 0)
+    {
+        /* for the ridge estimator glmnet assumes 0 vector with highest lambda */
+        beta_mat.col(0) = Eigen::VectorXd::Zero(n_vars);
+    }
+    else
+    {
+        init_beta = Eigen::VectorXd::Zero(n_vars);
+        beta_mat.col(0) = linear_elastic_net_optim(X, y, lambda, alpha,
+                                                   n_vars, n_obs,
+                                                   init_beta,
+                                                   tol, maxit);
+    }
     if (n_lambdas > 1)
     {
         for (int k = 1; k < n_lambdas; k++)
