@@ -134,22 +134,6 @@ Eigen::VectorXd linear_elastic_net_optim(
     return beta;
 }
 
-Eigen::MatrixXd linear_ridge_optim(
-    const Eigen::MatrixXd &X,
-    const Eigen::MatrixXd &y,
-    const double &lambda,
-    const int &n_vars,
-    const int &n_obs)
-{
-    Eigen::MatrixXd regul = Eigen::MatrixXd::Identity(n_obs, n_vars);
-    regul.array() *= lambda;
-    Eigen::MatrixXd Xt = X.transpose();
-    Eigen::MatrixXd XX_ridge = (Xt * X) + regul;
-    Eigen::VectorXd Xy = Xt * y;
-    Eigen::VectorXd ridge_est = XX_ridge.lu().solve(Xy);
-    return ridge_est;
-}
-
 Eigen::MatrixXd linear_lasso_component(
     const Eigen::MatrixXd &X,
     const Eigen::VectorXd &y,
@@ -215,29 +199,6 @@ Eigen::MatrixXd linear_elastic_net_component(
     return beta_mat;
 }
 
-Eigen::MatrixXd linear_ridge_component(
-    const Eigen::MatrixXd &X,
-    const Eigen::VectorXd &y,
-    const Eigen::VectorXd &lambdas)
-{
-    const int n_obs = X.rows();
-    const int n_vars = X.cols();
-    const int n_lambdas = lambdas.size();
-    double lambda = lambdas(0);
-    Eigen::MatrixXd beta_mat = Eigen::MatrixXd::Zero(n_vars, n_lambdas);
-    Eigen::VectorXd init_beta = Eigen::VectorXd::Zero(1);
-    beta_mat.col(0) = linear_ridge_optim(X, y, lambda, n_vars, n_obs);
-    if (n_lambdas > 1)
-    {
-        for (int k = 1; k < n_lambdas; k++)
-        {
-            lambda = lambdas(k);
-            beta_mat.col(k) = linear_ridge_optim(X, y, lambda, n_vars, n_obs);
-        }
-    }
-    return beta_mat;
-}
-
 Eigen::MatrixXd linear_elnet_coefs(
     const Eigen::MatrixXd &X,
     const Eigen::VectorXd &y,
@@ -250,10 +211,6 @@ Eigen::MatrixXd linear_elnet_coefs(
     if (alpha == 1)
     {
         beta_mat = linear_lasso_component(X, y, lambdas, tol, maxit);
-    }
-    else if (alpha == 0)
-    {
-        beta_mat = linear_ridge_component(X, y, lambdas);
     }
     else
     {

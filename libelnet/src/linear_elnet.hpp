@@ -55,22 +55,6 @@ Eigen::VectorXd linear_elastic_net_optim(
     const double &tol = 1e-7,
     const int &maxit = 1e+5);
 
-/** Optimization step for the linear ridge estimator
- * 
- * @param X Predictors
- * @param y Response
- * @param lambda Regularization parameter
- * @param n_vars Number of variables / predictors
- * @param n_obs Number of observations / rows
- * @return Estimated ridge coefficients
-*/
-Eigen::MatrixXd linear_ridge_optim(
-    const Eigen::MatrixXd &X,
-    const Eigen::MatrixXd &y,
-    const double &lambda,
-    const int &n_vars,
-    const int &n_obs);
-
 /** Estimate matrix of coefficients for the linear lasso
  * 
  * @param X Predictors. Assumed to be standardized beforehand (mean 0 and variance 1)
@@ -106,19 +90,6 @@ Eigen::MatrixXd linear_elastic_net_component(
     const double &alpha,
     const double &tol,
     const int &maxit);
-
-/** Estimate matrix of coefficients for the linear ridge
- * 
- * @param X Predictors. Assumed to be standardized beforehand (mean 0 and variance 1)
- * @param y Response. Assumed to be standardized beforehand
- * @param lambdas Vector of regularization parameters. Assumed to be normalized 
- * via standard deviation of y beforehand
- * @return Estimated coefficients for each lambda
-*/
-Eigen::MatrixXd linear_ridge_component(
-    const Eigen::MatrixXd &X,
-    const Eigen::VectorXd &y,
-    const Eigen::VectorXd &lambdas);
 
 /** Estimate elastic net for the linear model
  * 
