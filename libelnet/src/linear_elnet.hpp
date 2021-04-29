@@ -11,8 +11,6 @@
  * @param n_vars Number of variables / predictors
  * @param n_obs Number of observations / rows
  * @param init_beta Initial coefficients for warm starts
- * @param init_beta_available Whether init_beta should be used as warm start,
- * defaults to false
  * @param tol Tolerance level for stopping criterion
  * @param maxit Maximum number of iterations
  * @return Estimated lasso coefficients
@@ -24,7 +22,6 @@ Eigen::VectorXd linear_lasso_optim(
     const int &n_vars,
     const int &n_obs,
     const Eigen::VectorXd &init_beta,
-    const bool init_beta_available = false,
     const double &tol = 1e-7,
     const int &maxit = 1e+5);
 
@@ -37,8 +34,6 @@ Eigen::VectorXd linear_lasso_optim(
  * @param n_vars Number of variables / predictors
  * @param n_obs Number of observations / rows
  * @param init_beta Initial coefficients for warm starts
- * @param init_beta_available Whether init_beta should be used as warm start,
- * defaults to false
  * @param tol Tolerance level for stopping criterion
  * @param maxit Maximum number of iterations
  * @return Estimated elastic net coefficients
@@ -51,7 +46,6 @@ Eigen::VectorXd linear_elastic_net_optim(
     const int &n_vars,
     const int &n_obs,
     const Eigen::VectorXd &init_beta,
-    const bool init_beta_available = false,
     const double &tol = 1e-7,
     const int &maxit = 1e+5);
 

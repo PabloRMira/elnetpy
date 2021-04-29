@@ -1,7 +1,6 @@
 #include <cmath>
 #include <iostream>
 #include "Eigen/Dense"
-#include "Eigen/LU"
 #include "linear_elnet.hpp"
 
 Eigen::VectorXd linear_lasso_optim(
@@ -11,20 +10,11 @@ Eigen::VectorXd linear_lasso_optim(
     const int &n_vars,
     const int &n_obs,
     const Eigen::VectorXd &init_beta,
-    const bool init_beta_available,
     const double &tol,
     const int &maxit)
 {
-    Eigen::VectorXd previous_beta;
-    if (init_beta_available) /* if warm start available */
-    {
-        previous_beta = init_beta;
-    }
-    else
-    {
-        previous_beta = Eigen::VectorXd::Zero(n_vars);
-    }
-    Eigen::VectorXd beta = previous_beta;
+    Eigen::VectorXd previous_beta = init_beta; /* warm start */
+    Eigen::VectorXd beta = previous_beta;      /* initialize with previous beta */
     int iter = 0;
     double theta;
     double theta_abs;
@@ -75,28 +65,28 @@ Eigen::VectorXd linear_elastic_net_optim(
     const int &n_vars,
     const int &n_obs,
     const Eigen::VectorXd &init_beta,
-    const bool init_beta_available,
     const double &tol,
     const int &maxit)
 {
-    Eigen::VectorXd previous_beta;
-    if (init_beta_available) /* if warm start available */
-    {
-        previous_beta = init_beta;
-    }
-    else
-    {
-        previous_beta = Eigen::VectorXd::Zero(n_vars);
-    }
-    Eigen::VectorXd beta = previous_beta;
+    Eigen::VectorXd previous_beta = init_beta; /* warm start */
+    Eigen::VectorXd beta = previous_beta;      /* initialize with previous beta */
     int iter = 0;
     double theta;
     double theta_abs;
     int theta_sign;
     double diff_norm = 1;
-    double lambda_alpha = lambda * alpha;
-    /* denominator for update */
-    double denomi = 1 + (lambda * (1 - alpha));
+    double lambda_alpha;
+    double denomi; /* denominator for update */
+    if (alpha == 0)
+    {
+        lambda_alpha = 0.0;
+        denomi = 1 + lambda;
+    }
+    else
+    {
+        lambda_alpha = lambda * alpha;
+        denomi = 1 + (lambda * (1 - alpha));
+    }
     while ((diff_norm > tol) && (iter < maxit))
     {
         for (int j = 0; j < n_vars; j++)
@@ -146,10 +136,10 @@ Eigen::MatrixXd linear_lasso_component(
     const int n_lambdas = lambdas.size();
     double lambda = lambdas(0);
     Eigen::MatrixXd beta_mat = Eigen::MatrixXd::Zero(n_vars, n_lambdas);
-    Eigen::VectorXd init_beta = Eigen::VectorXd::Zero(1);
+    Eigen::VectorXd init_beta = Eigen::VectorXd::Zero(n_vars);
     beta_mat.col(0) = linear_lasso_optim(X, y, lambda,
                                          n_vars, n_obs,
-                                         init_beta, false,
+                                         init_beta,
                                          tol, maxit);
     if (n_lambdas > 1)
     {
@@ -159,7 +149,7 @@ Eigen::MatrixXd linear_lasso_component(
             init_beta = beta_mat.col(k - 1);
             beta_mat.col(k) = linear_lasso_optim(X, y, lambda,
                                                  n_vars, n_obs,
-                                                 init_beta, true,
+                                                 init_beta,
                                                  tol, maxit);
         }
     }
@@ -179,10 +169,10 @@ Eigen::MatrixXd linear_elastic_net_component(
     const int n_lambdas = lambdas.size();
     double lambda = lambdas(0);
     Eigen::MatrixXd beta_mat = Eigen::MatrixXd::Zero(n_vars, n_lambdas);
-    Eigen::VectorXd init_beta = Eigen::VectorXd::Zero(1);
+    Eigen::VectorXd init_beta = Eigen::VectorXd::Zero(n_vars);
     beta_mat.col(0) = linear_elastic_net_optim(X, y, lambda, alpha,
                                                n_vars, n_obs,
-                                               init_beta, false,
+                                               init_beta,
                                                tol, maxit);
     if (n_lambdas > 1)
     {
@@ -192,7 +182,7 @@ Eigen::MatrixXd linear_elastic_net_component(
             init_beta = beta_mat.col(k - 1);
             beta_mat.col(k) = linear_elastic_net_optim(X, y, lambda, alpha,
                                                        n_vars, n_obs,
-                                                       init_beta, true,
+                                                       init_beta,
                                                        tol, maxit);
         }
     }
