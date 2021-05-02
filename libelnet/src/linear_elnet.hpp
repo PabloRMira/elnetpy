@@ -57,6 +57,8 @@ Eigen::VectorXd linear_elastic_net_optim(
  * via standard deviation of y beforehand
  * @param tol Tolerance level for stopping criterion
  * @param maxit Maximum number of iterations
+ * @param devmax Stopping criterion for elastic net path with maximum deviance explained
+ * @param fdev Stopping criterion for elastic net path with difference to previous deviance
  * @return Estimated coefficients for each lambda
 */
 Eigen::MatrixXd linear_lasso_component(
@@ -64,7 +66,9 @@ Eigen::MatrixXd linear_lasso_component(
     const Eigen::VectorXd &y,
     const Eigen::VectorXd &lambdas,
     const double &tol,
-    const int &maxit);
+    const int &maxit,
+    const double &devmax = 0.999,
+    const double &fdev = 1e-5);
 
 /** Estimate matrix of coefficients for the linear elastic net
  * 
@@ -75,6 +79,8 @@ Eigen::MatrixXd linear_lasso_component(
  * @param alpha Regularization hyper parameter
  * @param tol Tolerance level for stopping criterion
  * @param maxit Maximum number of iterations
+ * @param devmax Stopping criterion for elastic net path with maximum deviance explained
+ * @param fdev Stopping criterion for elastic net path with difference to previous deviance
  * @return Estimated coefficients for each lambda
 */
 Eigen::MatrixXd linear_elastic_net_component(
@@ -83,7 +89,9 @@ Eigen::MatrixXd linear_elastic_net_component(
     const Eigen::VectorXd &lambdas,
     const double &alpha,
     const double &tol,
-    const int &maxit);
+    const int &maxit,
+    const double &devmax = 0.999,
+    const double &fdev = 1e-5);
 
 /** Estimate elastic net for the linear model
  * 

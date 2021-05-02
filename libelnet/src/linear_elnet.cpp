@@ -121,12 +121,20 @@ Eigen::MatrixXd linear_lasso_component(
     const Eigen::VectorXd &y,
     const Eigen::VectorXd &lambdas,
     const double &tol,
-    const int &maxit)
+    const int &maxit,
+    const double &devmax,
+    const double &fdev)
 {
     const int n_obs = X.rows();
     const int n_vars = X.cols();
     const int n_lambdas = lambdas.size();
     double lambda = lambdas(0);
+    double mse;          /* mse = mean squared error = deviance (for gaussian model like this) */
+    double rsq;          /* R squared = this is called deviance explained in glmnet */
+    double rsq_prev = 0; /* previous R-squared / deviance, for the first (intercept only) is 0 */
+    double rsq_change;   /* change in deviance for stopping criterion */
+    double fdev_crit;    /* adjusted stopping criterion for more efficiency */
+    Eigen::VectorXd betas;
     Eigen::MatrixXd beta_mat = Eigen::MatrixXd::Zero(n_vars, n_lambdas);
     Eigen::VectorXd init_beta = Eigen::VectorXd::Zero(n_vars);
     beta_mat.col(0) = linear_lasso_optim(X, y, lambda,
@@ -139,10 +147,24 @@ Eigen::MatrixXd linear_lasso_component(
         {
             lambda = lambdas(k);
             init_beta = beta_mat.col(k - 1);
-            beta_mat.col(k) = linear_lasso_optim(X, y, lambda,
-                                                 n_vars, n_obs,
-                                                 init_beta,
-                                                 tol, maxit);
+            betas = linear_lasso_optim(X, y, lambda,
+                                       n_vars, n_obs,
+                                       init_beta,
+                                       tol, maxit);
+            beta_mat.col(k) = betas;
+            mse = (y - X * betas).array().square().mean();
+            /* R squared is actually 1 - ( mse(model) / mse(only intercept) )
+               But because of standardization of y, mse(only intercept) = 1 and
+               this simplifies the calculation as below */
+            rsq = 1 - mse;
+            rsq_change = rsq - rsq_prev;
+            fdev_crit = fdev * rsq;
+            if (rsq > devmax || rsq_change < fdev_crit)
+            {
+                beta_mat = beta_mat.leftCols(k + 1);
+                break;
+            }
+            rsq_prev = rsq;
         }
     }
     return beta_mat;
@@ -154,12 +176,20 @@ Eigen::MatrixXd linear_elastic_net_component(
     const Eigen::VectorXd &lambdas,
     const double &alpha,
     const double &tol,
-    const int &maxit)
+    const int &maxit,
+    const double &devmax,
+    const double &fdev)
 {
     const int n_obs = X.rows();
     const int n_vars = X.cols();
     const int n_lambdas = lambdas.size();
     double lambda = lambdas(0);
+    double mse;          /* mse = mean squared error = deviance (for gaussian model like this) */
+    double rsq;          /* R squared = this is called deviance explained in glmnet */
+    double rsq_prev = 0; /* previous R-squared / deviance, for the first (intercept only) is 0 */
+    double rsq_change;   /* change in deviance for stopping criterion */
+    double fdev_crit;    /* adjusted stopping criterion for more efficiency */
+    Eigen::VectorXd betas;
     Eigen::MatrixXd beta_mat = Eigen::MatrixXd::Zero(n_vars, n_lambdas);
     Eigen::VectorXd init_beta;
     if (alpha == 0)
@@ -181,10 +211,24 @@ Eigen::MatrixXd linear_elastic_net_component(
         {
             lambda = lambdas(k);
             init_beta = beta_mat.col(k - 1);
-            beta_mat.col(k) = linear_elastic_net_optim(X, y, lambda, alpha,
-                                                       n_vars, n_obs,
-                                                       init_beta,
-                                                       tol, maxit);
+            betas = linear_elastic_net_optim(X, y, lambda, alpha,
+                                             n_vars, n_obs,
+                                             init_beta,
+                                             tol, maxit);
+            beta_mat.col(k) = betas;
+            mse = (y - X * betas).array().square().mean();
+            /* R squared is actually 1 - ( mse(model) / mse(only intercept) )
+               But because of standardization of y, mse(only intercept) = 1 and
+               this simplifies the calculation as below */
+            rsq = 1 - mse;
+            rsq_change = rsq - rsq_prev;
+            fdev_crit = fdev * rsq;
+            if (rsq > devmax || rsq_change < fdev_crit)
+            {
+                beta_mat = beta_mat.leftCols(k + 1);
+                break;
+            }
+            rsq_prev = rsq;
         }
     }
     return beta_mat;

@@ -55,8 +55,9 @@ class Elnet(BaseEstimator):
                 self.lambdas
                 if isinstance(self.lambdas, np.ndarray)
                 else np.array([self.lambdas])
-            ).astype(dtype="float64") / y_std
-            self.lambda_path_ = self.lambdas
+            ).astype(dtype="float64")
+            self.lambda_path_ = lambda_path_std
+            lambda_path_std /= y_std
 
         # get standardized coefficients
         coefs_mat = linear_elnet(
@@ -67,5 +68,8 @@ class Elnet(BaseEstimator):
         self.coef_path_, self.intercept_path_ = destandardize_coefs(
             coefs_mat, X_means, X_stds, y_mean, y_std
         )
+
+        # truncate lambda sequence for stopping criterion
+        self.lambda_path_ = self.lambda_path_[0 : self.coef_path_.shape[1]]
 
         return self
