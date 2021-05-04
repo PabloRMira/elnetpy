@@ -100,9 +100,9 @@ class Elnet(BaseEstimator):
                 f"""n_jobs should be integer valued.
                 Your input n_jobs is {n_jobs}"""
             )
-        if n_jobs < -1:
+        if n_jobs < -1 or n_jobs == 0:
             raise ValueError(
-                f"""n_jobs should be greater than -1.
+                f"""n_jobs should be greater than -1 and not 0.
                 Your input n_jobs is {n_jobs}"""
             )
         if tol <= 0 or tol >= 1:
@@ -110,10 +110,8 @@ class Elnet(BaseEstimator):
                 f"""tol should be between 0 and 1 exclusively.
                 Your input tol is {tol}"""
             )
-        if not isinstance(max_iter, float):
-            raise ValueError("max_iter should be float")
-        if max_iter <= 100:
+        if max_iter < 100:
             raise ValueError(
-                f"""max_iter should be greater than 100
+                f"""max_iter should be greater than or equal 100
                 Your input max_iter is {max_iter}"""
             )

@@ -70,3 +70,57 @@ def test_validate_elnet_alpha(alpha):
             Elnet(alpha=alpha)
     else:
         Elnet(alpha=alpha)
+
+
+@pytest.mark.parametrize("lambdas", [1, np.array([1, 2, 3]), "2"])
+def test_validate_elnet_lambdas(lambdas):
+    if isinstance(lambdas, str):
+        with pytest.raises(ValueError):
+            Elnet(lambdas=lambdas)
+    else:
+        Elnet(lambdas=lambdas)
+
+
+@pytest.mark.parametrize("n_lambda", [100, 5, -1])
+def test_validate_elnet_n_lambda(n_lambda):
+    if isinstance(n_lambda, str) or n_lambda <= 5:
+        with pytest.raises(ValueError):
+            Elnet(n_lambda=n_lambda)
+    else:
+        Elnet(n_lambda=n_lambda)
+
+
+@pytest.mark.parametrize("min_lambda_ratio", [1e-5, -1, 2, 0, 1])
+def test_validate_elnet_min_lambda_ratio(min_lambda_ratio):
+    if min_lambda_ratio <= 0 or min_lambda_ratio >= 1:
+        with pytest.raises(ValueError):
+            Elnet(min_lambda_ratio=min_lambda_ratio)
+    else:
+        Elnet(min_lambda_ratio=min_lambda_ratio)
+
+
+@pytest.mark.parametrize("n_jobs", [-5, 0, 1, 2, -1])
+def test_validate_elnet_n_jobs(n_jobs):
+    if n_jobs == 0 or n_jobs < -1:
+        with pytest.raises(ValueError):
+            Elnet(n_jobs=n_jobs)
+    else:
+        Elnet(n_jobs=n_jobs)
+
+
+@pytest.mark.parametrize("tol", [1e-5, 0, 1, 0.001])
+def test_validate_elnet_tol(tol):
+    if tol <= 0 or tol >= 1:
+        with pytest.raises(ValueError):
+            Elnet(tol=tol)
+    else:
+        Elnet(tol=tol)
+
+
+@pytest.mark.parametrize("max_iter", [1, 100, 200, 50])
+def test_validate_elnet_max_iter(max_iter):
+    if max_iter < 100:
+        with pytest.raises(ValueError):
+            Elnet(max_iter=max_iter)
+    else:
+        Elnet(max_iter=max_iter)
