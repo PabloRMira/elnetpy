@@ -7,3 +7,4 @@ test
 test.cpp
 __pycache__
 test.py
+.coverage
