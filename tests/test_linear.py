@@ -61,3 +61,12 @@ def test_elnet_glmnet(alpha):
     np.testing.assert_almost_equal(m.coef_path_, m2.coef_path_, decimal=4)
     # same intercept path
     np.testing.assert_almost_equal(m.intercept_path_, m2.intercept_path_, decimal=4)
+
+
+@pytest.mark.parametrize("alpha", [-0.5, 0, 0.5, 1, 1.01])
+def test_validate_elnet_alpha(alpha):
+    if alpha < 0 or alpha > 1:
+        with pytest.raises(ValueError):
+            Elnet(alpha=alpha)
+    else:
+        Elnet(alpha=alpha)

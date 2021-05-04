@@ -20,6 +20,9 @@ class Elnet(BaseEstimator):
         tol=1e-7,
         max_iter=1e5,
     ):
+        self._validate_input(
+            alpha, lambdas, n_lambda, min_lambda_ratio, n_jobs, tol, max_iter
+        )
         self.alpha = alpha
         self.lambdas = lambdas
         self.n_lambda = n_lambda
@@ -73,3 +76,44 @@ class Elnet(BaseEstimator):
         self.lambda_path_ = self.lambda_path_[0 : self.coef_path_.shape[1]]
 
         return self
+
+    @staticmethod
+    def _validate_input(
+        alpha, lambdas, n_lambda, min_lambda_ratio, n_jobs, tol, max_iter
+    ):
+        if alpha < 0 or alpha > 1:
+            raise ValueError(
+                f"""Alpha should be between 0 and 1 inclusively.
+                Your input alpha is {alpha}"""
+            )
+        if isinstance(lambdas, str):
+            raise ValueError("lambdas should be either None, numeric or numpy array")
+        if n_lambda <= 5:
+            raise ValueError("n_lambda should be greater than 5")
+        if min_lambda_ratio <= 0 or min_lambda_ratio >= 1:
+            raise ValueError(
+                f"""min_lambda_ratio should be between 0 and 1 exclusively.
+                You input min_lambda_ratio is {min_lambda_ratio}"""
+            )
+        if not isinstance(n_jobs, int):
+            raise ValueError(
+                f"""n_jobs should be integer valued.
+                Your input n_jobs is {n_jobs}"""
+            )
+        if n_jobs < -1:
+            raise ValueError(
+                f"""n_jobs should be greater than -1.
+                Your input n_jobs is {n_jobs}"""
+            )
+        if tol <= 0 or tol >= 1:
+            raise ValueError(
+                f"""tol should be between 0 and 1 exclusively.
+                Your input tol is {tol}"""
+            )
+        if not isinstance(max_iter, float):
+            raise ValueError("max_iter should be float")
+        if max_iter <= 100:
+            raise ValueError(
+                f"""max_iter should be greater than 100
+                Your input max_iter is {max_iter}"""
+            )
