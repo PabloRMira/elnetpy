@@ -1,8 +1,6 @@
 # Welcome to elnetpy!
 
-![CI](https://github.com/PabloRMira/elnetpy/workflows/CI/badge.svg)
-
-![Cov](https://github.com/PabloRMira/elnetpy/blob/master/img/coverage.svg)
+![CI](https://github.com/PabloRMira/elnetpy/workflows/CI/badge.svg) ![Cov](https://github.com/PabloRMira/elnetpy/blob/master/img/coverage.svg)
 
 A Python package to compute the elastic net algorithm, boosted by an own C++ implementation.
 
