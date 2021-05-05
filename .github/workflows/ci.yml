@@ -21,4 +21,5 @@ jobs:
           coverage report
       - name: Output coverage badge for master pushes
         if: ${{ github.ref == 'ref/head/master' }}
-        run: coverage-badge -o coverage.svg
+        run: |
+          coverage-badge -o coverage.svg
