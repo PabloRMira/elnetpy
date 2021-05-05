@@ -2,8 +2,11 @@ mytest:
 	g++ test.cpp -o test
 	./test
 
-upytest:
+utest:
 	pytest tests/unit_tests
+
+ptest:
+	pytest tests/performance_tests
 
 pycov:
 	coverage run -m pytest tests/unit_tests
