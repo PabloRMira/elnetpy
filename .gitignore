@@ -8,3 +8,4 @@ test.cpp
 __pycache__
 test.py
 .coverage
+test.sh

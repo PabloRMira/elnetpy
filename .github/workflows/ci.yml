@@ -1,0 +1,25 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.6"
+          architecture: "x64"
+      - name: Install the library
+        run: |
+          pip install pytest coverage coverage-badge
+          pip install -e .
+      - name: Run unit tests and print coverage
+        run: |
+          coverage run -m pytest tests/unit_tests
+          coverage report
+      - name: Output coverage badge (only for master)
+        run: |
+          current_branch=$(git rev-parse --abbrev-ref HEAD)
+          if [[ "$current_branch" == "master" ]]; then coverage-badge -o coverage.svg; false; fi
+      - uses: actions/upload-artifact@v2
+        if:
