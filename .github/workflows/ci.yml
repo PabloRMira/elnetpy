@@ -20,6 +20,6 @@ jobs:
           coverage run -m pytest tests/unit_tests
           coverage report
       - name: Output coverage badge for master pushes
-        if: ${{ github.ref == 'ref/head/master' }}
+        if: github.ref == 'refs/heads/master'
         run: |
           coverage-badge -o coverage.svg
