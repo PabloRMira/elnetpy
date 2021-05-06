@@ -23,6 +23,8 @@ jobs:
         if: github.ref == 'refs/heads/master'
         run: |
           coverage-badge -o .github/badges/coverage.svg
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "<>"
           git add .github/badges/coverage.svg
           git commit -a --no-edit
           git push -f origin master
