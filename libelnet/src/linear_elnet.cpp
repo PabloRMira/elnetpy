@@ -67,6 +67,7 @@ Eigen::MatrixXd linear_elastic_net_component(
     const Eigen::VectorXd &y,
     const Eigen::VectorXd &lambdas,
     const double &alpha,
+    const bool &early_stopping,
     const double &tol,
     const int &maxit,
     const double &devmax,
@@ -108,19 +109,22 @@ Eigen::MatrixXd linear_elastic_net_component(
                                              init_beta,
                                              tol, maxit);
             beta_mat.col(k) = betas;
-            mse = (y - X * betas).array().square().mean();
-            /* R squared is actually 1 - ( mse(model) / mse(only intercept) )
+            if (early_stopping)
+            {
+                mse = (y - X * betas).array().square().mean();
+                /* R squared is actually 1 - ( mse(model) / mse(only intercept) )
                But because of standardization of y, mse(only intercept) = 1 and
                this simplifies the calculation as below */
-            rsq = 1 - mse;
-            rsq_change = rsq - rsq_prev;
-            fdev_crit = fdev * rsq;
-            if (rsq > devmax || rsq_change < fdev_crit)
-            {
-                beta_mat = beta_mat.leftCols(k + 1);
-                break;
+                rsq = 1 - mse;
+                rsq_change = rsq - rsq_prev;
+                fdev_crit = fdev * rsq;
+                if (rsq > devmax || rsq_change < fdev_crit)
+                {
+                    beta_mat = beta_mat.leftCols(k + 1);
+                    break;
+                }
+                rsq_prev = rsq;
             }
-            rsq_prev = rsq;
         }
     }
     return beta_mat;
@@ -131,10 +135,10 @@ Eigen::MatrixXd linear_elnet_coefs(
     const Eigen::VectorXd &y,
     const Eigen::VectorXd &lambdas,
     const double &alpha,
+    const bool &early_stopping,
     const double &tol,
     const int &maxit)
 {
-    Eigen::MatrixXd beta_mat;
-    beta_mat = linear_elastic_net_component(X, y, lambdas, alpha, tol, maxit);
+    Eigen::MatrixXd beta_mat = linear_elastic_net_component(X, y, lambdas, alpha, early_stopping, tol, maxit);
     return beta_mat;
 }

@@ -3,11 +3,12 @@ mytest:
 	./test
 
 utest:
-	pytest tests/unit_tests
+	coverage run -m pytest tests/unit_tests
+	coverage report
 
 ptest:
 	pytest tests/performance_tests
 
 pycov:
 	coverage run -m pytest tests/unit_tests
-	coverage-badge -o img/coverage.svg
+	coverage-badge -f -o img/coverage.svg

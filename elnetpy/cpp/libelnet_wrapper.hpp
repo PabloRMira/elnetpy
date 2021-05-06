@@ -10,6 +10,7 @@ Eigen::MatrixXd linear_elnet(
     Eigen::Ref<Eigen::VectorXd> y,
     Eigen::Ref<Eigen::VectorXd> lambdas,
     const double alpha,
+    const bool early_stopping,
     const double tol = 1e-7,
     const double maxit = 1e+5);
 

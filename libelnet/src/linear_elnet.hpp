@@ -45,6 +45,7 @@ Eigen::MatrixXd linear_elastic_net_component(
     const Eigen::VectorXd &y,
     const Eigen::VectorXd &lambdas,
     const double &alpha,
+    const bool &early_stopping,
     const double &tol,
     const int &maxit,
     const double &devmax = 0.999,
@@ -67,6 +68,7 @@ Eigen::MatrixXd linear_elnet_coefs(
     const Eigen::VectorXd &y,
     const Eigen::VectorXd &lambdas,
     const double &alpha,
+    const bool &early_stopping = true,
     const double &tol = 1e-7,
     const int &maxit = 1e+5);
 
