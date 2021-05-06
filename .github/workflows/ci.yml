@@ -19,12 +19,3 @@ jobs:
         run: |
           coverage run -m pytest tests/unit_tests
           coverage report
-      - name: Commit coverage badge for master pushes
-        if: github.ref == 'refs/heads/master'
-        run: |
-          coverage-badge -o .github/badges/coverage.svg
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "<>"
-          git add .github/badges/coverage.svg
-          git commit --amend --no-edit
-          git push -f origin master
