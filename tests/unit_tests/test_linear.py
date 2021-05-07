@@ -124,3 +124,42 @@ def test_validate_elnet_max_iter(max_iter):
             Elnet(max_iter=max_iter)
     else:
         Elnet(max_iter=max_iter)
+
+
+@pytest.mark.parametrize("n_splits", [-1, 10, 20, 500])
+def test_validate_n_splits(n_splits):
+    if n_splits <= 0 or n_splits >= 100:
+        with pytest.raises(ValueError):
+            Elnet(n_splits=n_splits)
+    else:
+        Elnet(n_splits=n_splits)
+
+
+@pytest.mark.parametrize(
+    "scoring", ["mean_squared_error", "mean_absolute_error", "something_else"]
+)
+def test_validate_scoring(scoring):
+    if scoring == "something_else":
+        with pytest.raises(ValueError):
+            Elnet(scoring=scoring)
+    else:
+        Elnet(scoring=scoring)
+
+
+@pytest.mark.parametrize("random_state", [1, 10, 7.5, 3])
+def test_validate_random_state(random_state):
+    if isinstance(random_state, float):
+        with pytest.raises(ValueError):
+            Elnet(random_state=random_state)
+    else:
+        Elnet(random_state=random_state)
+
+
+def test_fit_cv():
+    rng = np.random.default_rng(SEED)
+    error = rng.normal(loc=0, scale=1, size=100)
+    X = rng.normal(loc=5, scale=2, size=(100, 4))
+    true_betas = np.array([1, -2, 0.5, 1])
+    y = X.dot(true_betas) + error
+    m = Elnet(n_splits=3)
+    m.fit(X, y)

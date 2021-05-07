@@ -27,7 +27,7 @@ class Elnet(BaseEstimator):
         n_lambda=100,
         min_lambda_ratio=1e-4,
         n_splits=1,
-        scoring="r2",
+        scoring="mean_squared_error",
         n_jobs=1,
         tol=1e-7,
         max_iter=1e5,
@@ -109,33 +109,18 @@ class Elnet(BaseEstimator):
 
         return self
 
-    def _score_one(
-        self, X, y, lambda_path, alpha, train_idx, test_idx, scorer, tol, max_iter
-    ):
-
-        X, y, X_means, X_stds, y_mean, y_std = standardize_inputs(
-            X, y, return_means_stds=True
-        )
-
-        # standardize lambdas
-        lambda_path_std = lambda_path / y_std
-
-        # get standardized coefficients
-        coefs_mat = linear_elnet(X, y, lambda_path_std, alpha, False, tol, max_iter)
-        y_preds_mat = X.dot(coefs_mat)
-        scores = score_multiple(y, y_preds_mat, scorer)
-        return scores
-
     def _fit_cv(self, X, y):
 
-        splits = KFold(n_splits=self.n_splits, random_state=self.random_state).split(X)
+        splits = KFold(
+            n_splits=self.n_splits, shuffle=True, random_state=self.random_state
+        ).split(X)
 
         scorer_dict = get_linear_scorer[self.scoring]
         scorer = scorer_dict["scorer"]
         greater_better = scorer_dict["greater_better"]
 
-        scores = Parallel(n_jobs=self.n_splits)(
-            delayed(self._score_one)(
+        scores = Parallel(n_jobs=self.n_splits, prefer="threads")(
+            delayed(_score_one)(
                 X,
                 y,
                 self.lambda_path_,
@@ -157,11 +142,11 @@ class Elnet(BaseEstimator):
         lambda_best_idx = np.argmax(self.cv_mean)
         self.lambda_best_ = self.lambda_path_[lambda_best_idx]
 
-        lambda_1std_idx = int(np.argwhere(self.cv_up >= self.cv_mean))
+        lambda_1std_idx = int(np.argwhere(self.cv_up >= self.cv_mean)[0])
         self.lambda_1std_ = self.lambda_path_[lambda_1std_idx]
 
-        self.coef_ = self.coef_path_[:, self.lambda_1std_]
-        self.intercept_ = self.intercept_path_[self.lambda_1std_]
+        self.coef_ = self.coef_path_[:, lambda_1std_idx]
+        self.intercept_ = self.intercept_path_[lambda_1std_idx]
 
         return self
 
@@ -249,3 +234,31 @@ class Elnet(BaseEstimator):
             )
         if not isinstance(random_state, int):
             raise ValueError("random_state should be an integer")
+
+
+def _score_one(X, y, lambda_path, alpha, train_idx, test_idx, scorer, tol, max_iter):
+
+    X_train = X[train_idx, :].astype(dtype="float64", order="F")
+    y_train = y[train_idx]
+
+    X_test = X[test_idx, :]
+    y_test = y[test_idx]
+
+    X_train, y_train, X_means, X_stds, y_mean, y_std = standardize_inputs(
+        X_train, y_train, return_means_stds=True
+    )
+
+    # standardize lambdas
+    lambda_path_std = lambda_path / y_std
+
+    # get standardized coefficients
+    coefs_mat = linear_elnet(
+        X_train, y_train, lambda_path_std, alpha, False, tol, max_iter
+    )
+    coefs_mat, intercepts = destandardize_coefs(
+        coefs_mat, X_means, X_stds, y_mean, y_std
+    )
+
+    y_preds_mat = X_test.dot(coefs_mat) + intercepts
+    scores = score_multiple(y_test, y_preds_mat, scorer)
+    return scores
