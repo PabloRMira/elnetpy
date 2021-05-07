@@ -9,6 +9,9 @@ utest:
 ptest:
 	pytest tests/performance_tests
 
+prepush: pycov
+
 pycov:
 	coverage run -m pytest tests/unit_tests
+	coverage report
 	coverage-badge -f -o img/coverage.svg

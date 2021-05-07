@@ -1,8 +1,17 @@
 "Test helper functions"
 
 import numpy as np
+import pytest
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-from elnetpy.utils import standardize_inputs, destandardize_coefs
+from elnetpy.utils import (
+    standardize_inputs,
+    destandardize_coefs,
+    get_linear_scorer,
+    score_multiple,
+    check_fitted_model,
+    interpolate_model,
+)
 
 
 def test_standardize_inputs():
@@ -83,3 +92,39 @@ def test_destandardize_coefs():
     )
     np.testing.assert_equal(coefs_mat_destd, expected_coefs_mat_destd)
     np.testing.assert_almost_equal(intercepts, expected_intercepts)
+
+
+def test_get_linear_scorer():
+    mae = get_linear_scorer["mean_absolute_error"]
+    assert mae["scorer"] == mean_absolute_error
+    assert not mae["greater_better"]
+
+
+def test_score_multiple():
+    y_true = np.array([1, 5, 2, 3])
+    y_preds_mat = np.array([[1, 8, 2], [8, 21, 1], [8, 1, 5], [10, 3, 1]])
+    scores = score_multiple(y_true, y_preds_mat, mean_squared_error)
+    expected_scores = (
+        ((y_preds_mat - y_true.reshape((4, 1))) ** 2).mean(axis=0).tolist()
+    )
+    assert scores == expected_scores
+
+
+def test_check_fitted_model():
+    unfitted_model = type("unfitted_model", (object,), {"something": 1})
+    fitted_model = type("unfitted_model", (object,), {"lambda_path_": [1, 2, 3]})
+    check_fitted_model(fitted_model)
+    with pytest.raises(Exception):
+        check_fitted_model(unfitted_model)
+
+
+def test_interpolate_model():
+    lamb = 0.5
+    lambda_path = np.array([0, 1])
+    coef_path = np.array([[10, 20], [20, 40]])
+    intercept_path = np.array([5, 10])
+    coef, intercept = interpolate_model(lamb, lambda_path, coef_path, intercept_path)
+    expected_coef = np.array([15, 30])
+    expected_intercept = np.array(7.5)
+    np.testing.assert_equal(coef, expected_coef)
+    np.testing.assert_equal(intercept, expected_intercept)

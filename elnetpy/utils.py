@@ -1,7 +1,14 @@
 "Helper functions for elastic net"
 
 import numpy as np
+from scipy.interpolate import interp1d
 from scipy.stats import zscore
+from sklearn.metrics import (
+    mean_squared_error,
+    mean_absolute_error,
+    r2_score,
+    median_absolute_error,
+)
 
 
 def standardize_inputs(X, y, return_means_stds=False):
@@ -51,3 +58,30 @@ def get_lambda_path(X, y, alpha, min_lambda_ratio, n_lambda):
         lambda_path
     )  # need contiguous array for c++ code to work
     return lambda_path
+
+
+get_linear_scorer = {
+    "mean_squared_error": {"scorer": mean_squared_error, "greater_better": False},
+    "mean_absolute_error": {"scorer": mean_absolute_error, "greater_better": False},
+    "median_absolute_error": {"scorer": median_absolute_error, "greater_better": False},
+    "r2": {"scorer": r2_score, "greater_better": True},
+}
+
+
+def score_multiple(y_true, y_preds_mat, scorer):
+    scores = [scorer(y_true, y_preds_mat[:, j]) for j in range(y_preds_mat.shape[1])]
+    return scores
+
+
+def check_fitted_model(model):
+    if not hasattr(model, "lambda_path_"):
+        raise Exception(
+            "Your model is not fitted yet. "
+            "Please fit your model via the fit() method first"
+        )
+
+
+def interpolate_model(lamb, lambda_path, coef_path, intercept_path):
+    coef = interp1d(lambda_path, coef_path)(lamb)
+    intercept = interp1d(lambda_path, intercept_path)(lamb)
+    return coef, intercept
