@@ -99,9 +99,9 @@ def test_validate_elnet_min_lambda_ratio(min_lambda_ratio):
         Elnet(min_lambda_ratio=min_lambda_ratio)
 
 
-@pytest.mark.parametrize("n_jobs", [-5, 0, 1, 2, -1])
+@pytest.mark.parametrize("n_jobs", [-5, 0, 1, 2, 2.3, -1])
 def test_validate_elnet_n_jobs(n_jobs):
-    if n_jobs == 0 or n_jobs < -1:
+    if n_jobs == 0 or n_jobs < -1 or not isinstance(n_jobs, int):
         with pytest.raises(ValueError):
             Elnet(n_jobs=n_jobs)
     else:
@@ -126,9 +126,9 @@ def test_validate_elnet_max_iter(max_iter):
         Elnet(max_iter=max_iter)
 
 
-@pytest.mark.parametrize("n_splits", [-1, 10, 20, 500])
+@pytest.mark.parametrize("n_splits", [-1, 10, 5.5, 20, 500])
 def test_validate_n_splits(n_splits):
-    if n_splits <= 0 or n_splits >= 100:
+    if n_splits <= 0 or n_splits >= 100 or not isinstance(n_splits, int):
         with pytest.raises(ValueError):
             Elnet(n_splits=n_splits)
     else:
@@ -163,3 +163,43 @@ def test_fit_cv():
     y = X.dot(true_betas) + error
     m = Elnet(n_splits=3)
     m.fit(X, y)
+    assert hasattr(m, "lambda_1std_")
+    assert hasattr(m, "lambda_best_")
+    assert hasattr(m, "cv_mean")
+    assert hasattr(m, "cv_std")
+    assert hasattr(m, "cv_up")
+    assert hasattr(m, "cv_low")
+
+
+def test_predict_default():
+    rng = np.random.default_rng(SEED)
+    error = rng.normal(loc=0, scale=1, size=100)
+    X = rng.normal(loc=5, scale=2, size=(100, 4))
+    true_betas = np.array([1, -2, 0.5, 1])
+    y = X.dot(true_betas) + error
+    m = Elnet(n_splits=3)
+    m.fit(X, y)
+    m.predict(X)
+
+
+def test_predict_custom_lambda():
+    rng = np.random.default_rng(SEED)
+    error = rng.normal(loc=0, scale=1, size=100)
+    X = rng.normal(loc=5, scale=2, size=(100, 4))
+    true_betas = np.array([1, -2, 0.5, 1])
+    y = X.dot(true_betas) + error
+    m = Elnet(n_splits=3)
+    m.fit(X, y)
+    m.predict(X, lamb=1)
+
+
+def test_predict_without_cv():
+    rng = np.random.default_rng(SEED)
+    error = rng.normal(loc=0, scale=1, size=100)
+    X = rng.normal(loc=5, scale=2, size=(100, 4))
+    true_betas = np.array([1, -2, 0.5, 1])
+    y = X.dot(true_betas) + error
+    m = Elnet(n_splits=1)
+    m.fit(X, y)
+    with pytest.raises(Exception):
+        m.predict(X)

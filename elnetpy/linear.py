@@ -165,12 +165,12 @@ class Elnet(BaseEstimator):
             intercept = self.intercept_
         else:
             coef, intercept = interpolate_model(
-                lamb, self.lambda_path, self.coef_path_, self.intercept_path_
+                lamb, self.lambda_path_, self.coef_path_, self.intercept_path_
             )
 
         y_pred = X.dot(coef) + intercept
 
-        if y_pred.shape[1] == 1:
+        if y_pred.ndim == 1:
             y_pred = y_pred.squeeze()
 
         return y_pred
@@ -225,6 +225,11 @@ class Elnet(BaseEstimator):
         if n_splits <= 0 or n_splits >= 100:
             raise ValueError(
                 f"""n_splits should be between 1 and 100
+                Your input n_splits is {n_splits}"""
+            )
+        if not isinstance(n_splits, int):
+            raise ValueError(
+                f"""n_splits should be integer valued.
                 Your input n_splits is {n_splits}"""
             )
         if not isinstance(scoring, str) or scoring not in get_linear_scorer.keys():
