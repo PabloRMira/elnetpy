@@ -191,6 +191,18 @@ def test_predict_custom_lambda():
     m.predict(X, lamb=1)
 
 
+def test_predict_multiple_lambdas():
+    rng = np.random.default_rng(SEED)
+    error = rng.normal(loc=0, scale=1, size=100)
+    X = rng.normal(loc=5, scale=2, size=(100, 4))
+    true_betas = np.array([1, -2, 0.5, 1])
+    y = X.dot(true_betas) + error
+    m = Elnet(n_splits=3)
+    m.fit(X, y)
+    preds = m.predict(X, lamb=[0.5, 1, 1.5])
+    assert preds.shape == (100, 3)
+
+
 def test_predict_without_cv():
     rng = np.random.default_rng(SEED)
     error = rng.normal(loc=0, scale=1, size=100)
