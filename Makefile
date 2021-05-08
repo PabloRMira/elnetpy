@@ -7,7 +7,7 @@ utest:
 	coverage report
 
 ptest:
-	pytest tests/performance_tests
+	pytest tests/performance_tests > perftest.txt
 
 prepush: pycov
 
