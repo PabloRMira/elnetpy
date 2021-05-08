@@ -15,3 +15,7 @@ pycov:
 	coverage run -m pytest tests/unit_tests
 	coverage report
 	coverage-badge -f -o img/coverage.svg
+
+upmaster:
+	git checkout master
+	git pull origin master
