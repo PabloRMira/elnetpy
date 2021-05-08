@@ -8,7 +8,7 @@ A Python package to compute the elastic net algorithm, boosted by an own C++ imp
 
 ## Promising performance
 
-Our package shows promising performance in comparison to the [Python port of the Fortran code](https://github.com/civisanalytics/python-glmnet/tree/master/glmnet) for the `glmnet` package. However, our package does not offer as many features as `glmnet` does.
+Our package shows promising performance in comparison to the [Python port of the Fortran code](https://github.com/civisanalytics/python-glmnet) for the `glmnet` package. However, our package does not offer as many features as `glmnet` does.
 
 Output of timings via pytest-benchmark:
 
@@ -33,3 +33,5 @@ test_linear_glmnet[0]        164.6977 (125.16)   186.6691 (43.97)    169.9443 (1
 Paper to `glmnet`: https://web.stanford.edu/~hastie/Papers/glmnet.pdf
 
 `glmnet` (read-only) GitHub repo: https://github.com/cran/glmnet
+
+Python port of the `glmnet` Fortran implementation: https://github.com/civisanalytics/python-glmnet
