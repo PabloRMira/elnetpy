@@ -135,18 +135,17 @@ class Elnet(BaseEstimator):
         )
         scores = np.array(scores) if greater_better else -np.array(scores)
         self.cv_mean = scores.mean(axis=0)
-        self.cv_std = scores.std(axis=0)
-        self.cv_up = self.cv_mean + self.cv_std
-        self.cv_low = self.cv_mean - self.cv_std
+        self.cv_se = scores.std(axis=0, ddof=1) / np.sqrt(self.n_splits)
 
-        lambda_best_idx = np.argmax(self.cv_mean)
-        self.lambda_best_ = self.lambda_path_[lambda_best_idx]
+        lambda_max_idx = np.argmax(self.cv_mean)
+        cv_max_low = (self.cv_mean - self.cv_se)[lambda_max_idx]
+        self.lambda_max_ = self.lambda_path_[lambda_max_idx]
 
-        lambda_1std_idx = int(np.argwhere(self.cv_up >= self.cv_mean)[0])
-        self.lambda_1std_ = self.lambda_path_[lambda_1std_idx]
+        lambda_1se_idx = int(np.argwhere(self.cv_mean >= cv_max_low)[0])
+        self.lambda_1se_ = self.lambda_path_[lambda_1se_idx]
 
-        self.coef_ = self.coef_path_[:, lambda_1std_idx]
-        self.intercept_ = self.intercept_path_[lambda_1std_idx]
+        self.coef_ = self.coef_path_[:, lambda_1se_idx]
+        self.intercept_ = self.intercept_path_[lambda_1se_idx]
 
         return self
 
@@ -154,13 +153,13 @@ class Elnet(BaseEstimator):
 
         check_fitted_model(self)
 
-        if lamb is None and not hasattr(self, "lambda_1std_"):
+        if lamb is None and not hasattr(self, "lambda_1se_"):
             raise Exception(
-                """Please provide a lamb value for predict
-                   or fit the estimator via cross validation
-                   to use lambda_1std as default"""
+                "Please provide a lamb value for predict "
+                "or fit the estimator via cross validation "
+                "to use lambda_1se as default"
             )
-        elif lamb is None and hasattr(self, "lambda_1std_"):
+        elif lamb is None and hasattr(self, "lambda_1se_"):
             coef = self.coef_
             intercept = self.intercept_
         else:

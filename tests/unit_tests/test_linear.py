@@ -6,7 +6,7 @@ from glmnet import ElasticNet
 
 from elnetpy.linear import Elnet
 
-SEED = 182
+SEED = 191
 
 
 def test_elnet_lambdas():
@@ -163,12 +163,10 @@ def test_fit_cv():
     y = X.dot(true_betas) + error
     m = Elnet(n_splits=3)
     m.fit(X, y)
-    assert hasattr(m, "lambda_1std_")
-    assert hasattr(m, "lambda_best_")
+    assert hasattr(m, "lambda_1se_")
+    assert hasattr(m, "lambda_max_")
     assert hasattr(m, "cv_mean")
-    assert hasattr(m, "cv_std")
-    assert hasattr(m, "cv_up")
-    assert hasattr(m, "cv_low")
+    assert hasattr(m, "cv_se")
 
 
 def test_predict_default():
@@ -203,3 +201,17 @@ def test_predict_without_cv():
     m.fit(X, y)
     with pytest.raises(Exception):
         m.predict(X)
+
+
+def test_fit_cv_glmnet_comparison():
+    rng = np.random.default_rng(SEED)
+    error = rng.normal(loc=0, scale=1, size=100)
+    X = rng.normal(loc=5, scale=2, size=(100, 4))
+    true_betas = np.array([1, -2, 0.5, 1])
+    y = X.dot(true_betas) + error
+    m = Elnet(n_splits=3, random_state=182, scoring="r2")
+    m.fit(X, y)
+    m2 = ElasticNet(n_splits=3, random_state=182)
+    m2.fit(X, y)
+    np.testing.assert_almost_equal(m.lambda_max_, m2.lambda_max_)
+    np.testing.assert_almost_equal(m.lambda_1se_, m2.lambda_best_[0])
