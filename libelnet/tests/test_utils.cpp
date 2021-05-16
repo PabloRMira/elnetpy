@@ -2,7 +2,6 @@
 #include "Eigen/Dense"
 
 #include "utils.hpp"
-#include "logistic_elnet.hpp"
 
 TEST(Utils, Standardization)
 {
@@ -18,19 +17,19 @@ TEST(Utils, Standardization)
         1.40183, 0.707107, 0;
     Eigen::VectorXd expected_y(3);
     expected_y << -1.22474, 0, 1.22474;
-    Eigen::VectorXd expected_X_means(3);
+    Eigen::RowVectorXd expected_X_means(3);
     expected_X_means << 3.66667, 4.33333, 2;
     double expected_y_mean = 2;
-    Eigen::VectorXd expected_X_stds(3);
+    Eigen::RowVectorXd expected_X_stds(3);
     expected_X_stds << 3.09121, 0.942809, 0.816497;
     double expected_y_std = 0.816497;
     StdOut out = standardize_inplace(X, y);
-    EXPECT_EQ(X, expected_X);
-    EXPECT_EQ(y, expected_y);
-    EXPECT_EQ(out.X_means, expected_X_means);
-    EXPECT_EQ(out.y_mean, expected_y_mean);
-    EXPECT_EQ(out.X_stds, expected_X_stds);
-    EXPECT_EQ(out.y_std, expected_y_std);
+    EXPECT_TRUE(X.isApprox(expected_X, 1e-5));
+    EXPECT_TRUE(y.isApprox(expected_y, 1e-5));
+    EXPECT_TRUE(out.X_means.isApprox(expected_X_means, 1e-5));
+    EXPECT_NEAR(out.y_mean, expected_y_mean, 1e-5);
+    EXPECT_TRUE(out.X_stds.isApprox(expected_X_stds, 1e-5));
+    EXPECT_NEAR(out.y_std, expected_y_std, 1e-5);
 }
 
 TEST(Utils, CoefsStandardization)
@@ -57,9 +56,44 @@ TEST(Utils, CoefsDestandardization)
     double y_mean = 1;
     double y_std = 0.5;
     Coefs out = destandardize_coefs(betas, X_means, X_stds, y_mean, y_std);
-    const Eigen::VectorXd expected_betas_destd(3);
+    Eigen::VectorXd expected_betas_destd(3);
     expected_betas_destd << 0.5, 0.5, 0.1875;
-    const double expected_intercept << -2.375;
+    const double expected_intercept = -2.375;
     EXPECT_EQ(out.betas, expected_betas_destd);
     EXPECT_EQ(out.intercept, expected_intercept);
+}
+
+TEST(Utils, NullLoglikelihood)
+{
+    Eigen::VectorXd y(5);
+    y << 1, 0, 0, 1, 1;
+    const double null_loglik = get_null_loglik(y);
+    const double expected_null_loglik = -3.36506;
+    EXPECT_NEAR(null_loglik, expected_null_loglik, 1e-5);
+}
+
+TEST(Utils, Loglikelihood)
+{
+    Eigen::VectorXd y(5);
+    y << 1, 0, 0, 1, 1;
+    Eigen::VectorXd probs(5);
+    probs << 0.8, 0, 0.5, 0.3, 1;
+    const double loglik = get_loglik(probs, y);
+    const double expected_loglik = -2.12028;
+    EXPECT_NEAR(loglik, expected_loglik, 1e-5);
+}
+
+TEST(Utils, GetProbs)
+{
+    Eigen::MatrixXd X(3, 3);
+    X << 1, 5, 20,
+        2, 3, 1,
+        8, 5, 2;
+    Eigen::VectorXd beta(3);
+    beta << -1, .5, 1;
+    const double intercept = -0.5;
+    Eigen::VectorXd probs = get_probs(X, beta, intercept);
+    Eigen::VectorXd expected_probs(3);
+    expected_probs << 0.99999, 0.5, 0.0179862;
+    EXPECT_TRUE(probs.isApprox(expected_probs, 1e-5));
 }

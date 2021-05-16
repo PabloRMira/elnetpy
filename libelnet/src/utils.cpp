@@ -38,3 +38,41 @@ Coefs destandardize_coefs(const Eigen::VectorXd &betas,
     out.intercept = y_mean - out.betas.dot(X_means);
     return out;
 }
+
+double get_null_loglik(const Eigen::VectorXd &y)
+{
+    const double y_mean = y.array().mean();
+    const int n1 = y.array().sum();
+    const int n0 = y.size() - n1;
+    const double null_loglik = (n1 * std::log(y_mean)) + (n0 * std::log(1 - y_mean));
+    return null_loglik;
+}
+
+double get_loglik(const Eigen::VectorXd &probs,
+                  const Eigen::VectorXd &y,
+                  const double &prob_eps)
+{
+    const double min_prob = prob_eps;
+    const double max_prob = 1 - prob_eps;
+    Eigen::VectorXd probs_adj = probs;
+    probs_adj = (probs_adj.array() > max_prob).select(max_prob, probs_adj);
+    probs_adj = (probs_adj.array() < min_prob).select(min_prob, probs_adj);
+    const double loglik = ((y.array() * probs_adj.array().log()) +
+                           ((1 - y.array()) * (1 - probs_adj.array()).log()))
+                              .sum();
+    return loglik;
+}
+
+Eigen::VectorXd get_probs(const Eigen::MatrixXd &X,
+                          const Eigen::VectorXd &beta,
+                          const double &intercept,
+                          const double &prob_eps)
+{
+    const double min_prob = prob_eps;
+    const double max_prob = 1 - prob_eps;
+    const Eigen::VectorXd neg_linear_effects = -(intercept + (X * beta).array());
+    Eigen::VectorXd probs = (1 + neg_linear_effects.array().exp()).cwiseInverse();
+    probs = (probs.array() > max_prob).select(max_prob, probs);
+    probs = (probs.array() < min_prob).select(min_prob, probs);
+    return probs;
+}
