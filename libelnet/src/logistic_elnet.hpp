@@ -3,11 +3,7 @@
 
 #include "Eigen/Dense"
 
-struct WeightedInput
-{
-    Eigen::MatrixXd Xt;
-    Eigen::VectorXd yt;
-};
+#include "utils.hpp"
 
 /** Get weighted input for iteratively reweighted least squares (IRLS)
  * 
@@ -21,12 +17,6 @@ WeightedInput get_weighted_inputs(const Eigen::MatrixXd &X,
                                   const Eigen::VectorXd &y,
                                   const Eigen::VectorXd &beta,
                                   const double &intercept);
-
-struct Coefs
-{
-    Eigen::VectorXd betas;
-    double intercept;
-};
 
 /** Logistic elastic net optimization step
  * 
@@ -79,6 +69,8 @@ Eigen::MatrixXd logistic_elnet_coefs(
     const double &alpha,
     const bool &early_stopping = true,
     const double &tol = 1e-7,
-    const int &maxit = 1e+5);
+    const int &maxit = 1e+5,
+    const double &devmax = 0.999,
+    const double &fdev = 1e-5);
 
 #endif
