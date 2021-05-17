@@ -15,7 +15,7 @@ WeightedInput get_weighted_inputs(const Eigen::MatrixXd &X,
     const Eigen::VectorXd weights_invsqrt = weights_sqrt.array().inverse();
     WeightedInput out;
     out.Xt = X.array().colwise() * weights_sqrt.array();
-    out.yt = ((intercept * weights_sqrt.array()) + (out.Xt * beta).array()) + ((y - probs).array() * weights_invsqrt.array());
+    out.yt = ((intercept + (X * beta).array()) * weights_sqrt.array()) + ((y - probs).array() * weights_invsqrt.array());
     return out;
 }
 
